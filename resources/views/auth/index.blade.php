@@ -335,7 +335,7 @@
 
       <div class="divider">Or</div>
 
-      @if ($errors->any())
+      @if ($errors->any() && session('panel') !== 'login')
         <div style="background:#3b1a1a; border:1px solid #7a2b2b; color:#f3b8b8; padding:10px 14px; border-radius:10px; font-size:13px; margin-bottom:4px;">
           {{ $errors->first() }}
         </div>
@@ -397,11 +397,17 @@
 
       <div class="divider">Or</div>
 
+      @if ($errors->any() && session('panel') === 'login')
+        <div style="background:#3b1a1a; border:1px solid #7a2b2b; color:#f3b8b8; padding:10px 14px; border-radius:10px; font-size:13px;">
+          {{ $errors->first() }}
+        </div>
+      @endif
+
       <form id="loginForm" method="POST" action="{{ route('login') }}" novalidate>
         @csrf
         <div class="field" id="field-login_email">
           <label for="login_email">Email</label>
-          <input type="email" id="login_email" name="email" placeholder="eg.Johnfranc@gmail.com">
+          <input type="email" id="login_email" name="email" placeholder="eg.Johnfranc@gmail.com" value="{{ old('email') }}">
           <div class="field-error">Please enter a valid email address.</div>
         </div>
 
@@ -499,6 +505,11 @@
 
     if (!valid) e.preventDefault();
   });
+
+  // Show the Log In panel after a failed login
+  @if (session('panel') === 'login')
+    showLogin();
+  @endif
 </script>
 
 </body>

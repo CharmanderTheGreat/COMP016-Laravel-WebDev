@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -28,11 +26,10 @@ class AuthController extends Controller
         $user = User::create([
             'name'     => trim($validated['first_name'] . ' ' . $validated['last_name']),
             'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => $validated['password'],
         ]);
 
         Auth::login($user);
-
         $request->session()->regenerate();
 
         return redirect()->intended('/dashboard')
@@ -46,12 +43,11 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $remember = $request->boolean('remember');
-
-        if (! Auth::attempt($credentials, $remember)) {
-            throw ValidationException::withMessages([
-                'email' => 'These credentials do not match our records.',
-            ]);
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            return back()
+                ->withInput($request->only('email'))
+                ->with('panel', 'login')
+                ->withErrors(['email' => 'These credentials do not match our records.']);
         }
 
         $request->session()->regenerate();
@@ -63,7 +59,6 @@ class AuthController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
