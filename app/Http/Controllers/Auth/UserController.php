@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -28,7 +33,26 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->request);
+        //validate the request
+        $request->validate([
+            "name" => "required",
+            "email" => "required",
+            "password" => "required",
+            "role" => ["required", Rule::enum(Role::class)],
+        ]);
+
+        //create the user in the database
+        $user = User::create([
+            "name" => $request->name,
+            "email" => $request->email,
+            "password" => Hash::make($request->password),
+            "role" => $request->role
+        ]);
+
+        //log them in
+        Auth::login($user);
+        //redirect home
+        return redirect("/");
     }
 
     /**

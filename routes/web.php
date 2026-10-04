@@ -6,5 +6,4 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/register', [UserController::class, "create"]);
-
 Route::post('/register', [UserController::class, "store"]);

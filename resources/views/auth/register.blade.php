@@ -6,6 +6,9 @@
             <legend class="fieldset-legend">Login</legend>
 
             <label class="label">Email</label>
+            <input name="name" type="text" class="input" placeholder="Name" />
+
+            <label class="label">Email</label>
             <input name="email" type="email" class="input" placeholder="Email" />
 
             <label class="label">Password</label>
