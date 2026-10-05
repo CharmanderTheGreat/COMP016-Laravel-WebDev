@@ -1,16 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
-use App\Enums\Role;
-use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
-class UserController extends Controller
+class SessionsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,7 +20,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('auth.register');
+        return view("auth.login");
     }
 
     /**
@@ -33,26 +28,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //validate the request
-        $request->validate([
-            "name" => "required",
-            "email" => "required",
-            "password" => "required",
-            "role" => ["required", Rule::enum(Role::class)],
+        //validate
+        $validated = $request->validate([
+            'email' => ['required', "string", "email", "max:255"],
+            "password" => ["required", "string", "min:8", "max:255"]
         ]);
 
-        //create the user in the database
-        $user = User::create([
-            "name" => $request->name,
-            "email" => $request->email,
-            "password" => Hash::make($request->password),
-            "role" => $request->role
-        ]);
+        //attempt a login
+        if(Auth::attempt($validated)){
+            $request->session()->regenerate();
 
-        //log them in
-        Auth::login($user);
-        //redirect home
-        return redirect("/attendance");
+            return redirect("/attendance");
+        }
+
+        //redirect back on failure
+        return back()->withErrors([]);
     }
 
     /**

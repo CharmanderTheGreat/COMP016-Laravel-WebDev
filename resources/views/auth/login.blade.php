@@ -1,12 +1,19 @@
 <x-layout>
-    <div>
+    <form action="/login" method="POST">
+        @csrf
 
-        <form action="">
-            <input type="text" name="email">
-            <input type="text" name="password">
-            <button>Login</button>
-        </form>
+        <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 mx-auto">
+            <legend class="fieldset-legend">Login</legend>
 
-    </div>
+            <label class="label">Email</label>
+            <input name="email" type="email" class="input" placeholder="Email" />
+
+            <label class="label">Password</label>
+            <input name="password" type="password" class="input" placeholder="Password" />
+
+            <button class="btn btn-neutral mt-4">Login</button>
+        </fieldset>
+
+    </form>
+
 </x-layout>
-
