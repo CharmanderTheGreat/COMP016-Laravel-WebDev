@@ -1,23 +1,20 @@
+@props(['title' => 'Attendance System'])
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $title }}</title>
 
+    {{-- Tailwind (browser build) + daisyUI via CDN. Loaded once only. --}}
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
-
 </head>
 <body>
-
-    <main class="max-w-3xl mx-auto mt-6">
-        {{$slot}}
+    {{-- Pages control their own width/centering --}}
+    <main class="w-full mt-6">
+        {{ $slot }}
     </main>
-
 </body>
 </html>
