@@ -16,7 +16,7 @@ class User extends Authenticatable
 
     /**
      * Mass-assignable attributes.
-     * NOTE: `role` is only ever set by our own code (register = student,
+     * NOTE: `role` is only ever set by our own code (register = students,
      * instructor = seeder), never copied from request input.
      */
     protected $fillable = [

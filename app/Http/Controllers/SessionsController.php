@@ -33,16 +33,16 @@ class SessionsController extends Controller
         $password = $request->input('password');
 
         if (preg_match(Student::ID_REGEX, strtoupper($login))) {
-            // Looks like a student ID -> find that student's account email
+            // Looks like a students ID -> find that students's account email
             $email = User::whereHas(
-                'student',
+                'students',
                 fn ($q) => $q->where('student_number', strtoupper($login))
             )->value('email') ?? '';
 
             $credentials = ['email' => $email, 'password' => $password];
         } else {
             // Anything else is treated as an email, and ONLY instructors may use it.
-            // The extra 'role' condition makes a student's email fail here.
+            // The extra 'role' condition makes a students's email fail here.
             $credentials = [
                 'email'    => $login,
                 'password' => $password,
@@ -53,7 +53,7 @@ class SessionsController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate(); // prevents session fixation
 
-            // Student -> /student/dashboard, instructor -> /instructor/dashboard
+            // Student -> /students/dashboard, instructor -> /instructor/dashboard
             return redirect()->intended(Auth::user()->role->homePath());
         }
 

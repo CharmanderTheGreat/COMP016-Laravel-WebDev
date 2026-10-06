@@ -20,7 +20,7 @@
     {{-- Recent records (full list lives in the Attendance History tab) --}}
     <div class="flex items-center justify-between mb-2">
         <h2 class="text-xl font-semibold">Recent attendance</h2>
-        <a href="{{ route('student.attendance') }}" class="link link-hover text-sm">View all</a>
+        <a href="{{ route('students.attendance') }}" class="link link-hover text-sm">View all</a>
     </div>
 
     @if ($recent->isEmpty())

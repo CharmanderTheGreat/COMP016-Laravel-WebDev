@@ -36,13 +36,13 @@ class Student extends Model
         return $this->hasMany(Attendance::class);
     }
 
-    /** $student->full_name => "Juan Dela Cruz" */
+    /** $students->full_name => "Juan Dela Cruz" */
     protected function fullName(): Attribute
     {
         return Attribute::get(fn () => "{$this->first_name} {$this->last_name}");
     }
 
-    /** $student->class_label => "BSIT 3-2" */
+    /** $students->class_label => "BSIT 3-2" */
     protected function classLabel(): Attribute
     {
         return Attribute::get(
@@ -51,7 +51,7 @@ class Student extends Model
     }
 
     /**
-     * $student->photo_url => public URL of the profile picture, or null.
+     * $students->photo_url => public URL of the profile picture, or null.
      * Uses asset() so it follows the current host (needs `php artisan storage:link`).
      */
     protected function photoUrl(): Attribute

@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Short alias so routes can say 'role:student'
+        // Short alias so routes can say 'role:students'
         $middleware->alias(['role' => EnsureUserHasRole::class]);
 
         // Not logged in -> go to the login page

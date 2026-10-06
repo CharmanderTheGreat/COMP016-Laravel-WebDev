@@ -11,7 +11,7 @@ use Illuminate\Database\Seeder;
 class DemoAttendanceSeeder extends Seeder
 {
     /**
-     * DEMO ONLY: fills every registered student with fake weekday attendance
+     * DEMO ONLY: fills every registered students with fake weekday attendance
      * for the last ~45 days so the dashboard/history UI has something to show.
      * Run manually:  php artisan db:seed --class=DemoAttendanceSeeder
      */

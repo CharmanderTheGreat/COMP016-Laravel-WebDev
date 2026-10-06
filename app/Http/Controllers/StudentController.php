@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 /**
  * Student side: dashboard, profile (read-only), attendance history.
- * Every method only ever reads the LOGGED-IN student's own data.
+ * Every method only ever reads the LOGGED-IN students's own data.
  */
 class StudentController extends Controller
 {
@@ -37,7 +37,7 @@ class StudentController extends Controller
 
         $subject = Subject::first();
 
-        return view('student.dashboard', compact('student', 'counts', 'recent', 'subject'));
+        return view('students.dashboard', compact('student', 'counts', 'recent', 'subject'));
     }
 
     /** Profile tab (view only for now). */
@@ -45,7 +45,7 @@ class StudentController extends Controller
     {
         $student = $this->currentStudent($request);
 
-        return view('student.profile', compact('student'));
+        return view('students.profile', compact('student'));
     }
 
     /**
@@ -85,12 +85,12 @@ class StudentController extends Controller
         $records = $all->filter(fn ($r) => $r->date->format('Y-m') === $month);
         $records = ($dir === 'asc' ? $records->sortBy($key) : $records->sortByDesc($key))->values();
 
-        return view('student.history', compact('student', 'records', 'months', 'month', 'sort', 'dir'));
+        return view('students.history', compact('student', 'records', 'months', 'month', 'sort', 'dir'));
     }
 
-    /** The student profile of whoever is logged in (403 if somehow missing). */
+    /** The students profile of whoever is logged in (403 if somehow missing). */
     private function currentStudent(Request $request): Student
     {
-        return $request->user()->student ?? abort(403, 'No student profile found.');
+        return $request->user()->student ?? abort(403, 'No students profile found.');
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\Instructor;
 use Illuminate\Support\Facades\Route;
 
 // Home -> login (guests) or own dashboard (via the guest middleware redirect)
@@ -20,9 +21,9 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [SessionsController::class, 'destroy'])->middleware('auth');
 
 // ---- Student side ----
-Route::middleware(['auth', 'role:student'])
-    ->prefix('student')
-    ->name('student.')
+Route::middleware(['auth', 'role:students'])
+    ->prefix('students')
+    ->name('students.')
     ->group(function () {
         Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('dashboard');
         Route::get('/profile', [StudentController::class, 'profile'])->name('profile');
@@ -31,4 +32,7 @@ Route::middleware(['auth', 'role:student'])
 
 // ---- Instructor side (placeholder; the instructor dev replaces this) ----
 Route::middleware(['auth', 'role:instructor'])
-    ->get('/instructor/dashboard', fn () => view('instructor.dashboard'));
+    ->prefix('instructor')
+    ->group(function () {
+        Route::get("/students", [Instructor\StudentController::class, 'index'])->name('students');
+});

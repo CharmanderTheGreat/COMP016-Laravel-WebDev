@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * One row = one student's status for one subject on one date.
-     * The instructor side will write to this table; the student side reads it.
+     * One row = one students's status for one subject on one date.
+     * The instructor side will write to this table; the students side reads it.
      */
     public function up(): void
     {
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('status');
             $table->timestamps();
 
-            // A student can only have one record per subject per day.
+            // A students can only have one record per subject per day.
             $table->unique(['student_id', 'subject_id', 'date']);
         });
     }

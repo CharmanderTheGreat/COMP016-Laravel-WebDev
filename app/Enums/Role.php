@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum Role: string
 {
-    case Student = "student";
+    case Student = "students";
     case Instructor = "instructor";
 
     /**
@@ -14,8 +14,8 @@ enum Role: string
     public function homePath(): string
     {
         return match ($this) {
-            self::Student => '/student/dashboard',
-            self::Instructor => '/instructor/dashboard',
+            self::Student => '/students/dashboard',
+            self::Instructor => '/instructor/students',
         };
     }
 }

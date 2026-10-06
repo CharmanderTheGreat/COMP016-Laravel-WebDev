@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Usage in routes: ->middleware('role:student') or ->middleware('role:instructor')
+ * Usage in routes: ->middleware('role:students') or ->middleware('role:instructor')
  * If the logged-in user has a different role, send them to their OWN home page
  * instead of showing an error.
  */

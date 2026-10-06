@@ -14,14 +14,14 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-    /** Show the student sign up form. */
+    /** Show the students sign up form. */
     public function create()
     {
         return view('auth.register');
     }
 
     /**
-     * Handle student sign up.
+     * Handle students sign up.
      * Only students can register; the instructor is seeded (InstructorSeeder).
      */
     public function store(Request $request)
@@ -49,7 +49,7 @@ class UserController extends Controller
         // Save the picture to storage/app/public/profile-photos
         $photoPath = $request->file('profile_photo')->store('profile-photos', 'public');
 
-        // Create the user + student profile together (all or nothing)
+        // Create the user + students profile together (all or nothing)
         $user = DB::transaction(function () use ($data, $photoPath) {
             $user = User::create([
                 'name'     => $data['first_name'] . ' ' . $data['last_name'],

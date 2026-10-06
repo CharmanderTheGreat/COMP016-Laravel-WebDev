@@ -1,6 +1,6 @@
 {{--
-    Shared shell for all student pages: top bar, logout, and the tab menu.
-    Usage: <x-student-layout title="Dashboard" active="dashboard"> ... </x-student-layout>
+    Shared shell for all students pages: top bar, logout, and the tab menu.
+    Usage: <x-students-layout title="Dashboard" active="dashboard"> ... </x-students-layout>
     `active` = dashboard | profile | attendance (highlights the current tab)
 --}}
 @props(['title' => 'Student', 'active' => 'dashboard'])
@@ -23,11 +23,11 @@
 
         {{-- Tab menu --}}
         <div role="tablist" class="tabs tabs-border mb-6">
-            <a role="tab" href="{{ route('student.dashboard') }}"
+            <a role="tab" href="{{ route('students.dashboard') }}"
                class="tab {{ $active === 'dashboard' ? 'tab-active' : '' }}">Dashboard</a>
-            <a role="tab" href="{{ route('student.profile') }}"
+            <a role="tab" href="{{ route('students.profile') }}"
                class="tab {{ $active === 'profile' ? 'tab-active' : '' }}">Profile</a>
-            <a role="tab" href="{{ route('student.attendance') }}"
+            <a role="tab" href="{{ route('students.attendance') }}"
                class="tab {{ $active === 'attendance' ? 'tab-active' : '' }}">Attendance History</a>
         </div>
 
