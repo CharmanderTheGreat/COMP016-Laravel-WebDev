@@ -13,7 +13,7 @@
 </head>
 <body>
     {{-- Pages control their own width/centering --}}
-    <main class="w-full mt-6">
+    <main class="w-full">
         {{ $slot }}
     </main>
 </body>

@@ -35,4 +35,13 @@ Route::middleware(['auth', 'role:instructor'])
     ->prefix('instructor')
     ->group(function () {
         Route::get("/students", [Instructor\StudentController::class, 'index'])->name('students');
-});
+
+        Route::get("/attendance", [Instructor\AttendanceController::class, 'index']);
+        Route::get("/attendance/{date}", [Instructor\AttendanceController::class, 'show'])
+        ->where('date', '\d{4}-\d{2}-\d{2}')
+        ->name('instructor.attendance.show');
+
+        Route::get("/attendance/create", [Instructor\AttendanceController::class, 'create']);
+        Route::post("/attendance/create", [Instructor\AttendanceController::class, 'store']);
+    });
+
