@@ -38,7 +38,6 @@
                     <tr>
                         <th><a href="{{ $link('date') }}" class="link link-hover">Date {{ $arrow('date') }}</a></th>
                         <th><a href="{{ $link('subject') }}" class="link link-hover">Subject {{ $arrow('subject') }}</a></th>
-                        <th><a href="{{ $link('status') }}" class="link link-hover">Status {{ $arrow('status') }}</a></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,11 +45,6 @@
                         <tr>
                             <td>{{ $record->date->format('M d, Y') }}</td>
                             <td>{{ $record->subject->code }}</td>
-                            <td>
-                                <span class="badge {{ $record->status->badgeClass() }}">
-                                    {{ $record->status->label() }}
-                                </span>
-                            </td>
                         </tr>
                     @endforeach
                 </tbody>

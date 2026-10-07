@@ -37,7 +37,7 @@ class StudentController extends Controller
 
         $subject = Subject::first();
 
-        return view('students.dashboard', compact('student', 'counts', 'recent', 'subject'));
+        return view('student.dashboard', compact('student', 'counts', 'recent', 'subject'));
     }
 
     /** Profile tab (view only for now). */
@@ -45,7 +45,7 @@ class StudentController extends Controller
     {
         $student = $this->currentStudent($request);
 
-        return view('students.profile', compact('student'));
+        return view('student.profile', compact('student'));
     }
 
     /**
@@ -85,7 +85,7 @@ class StudentController extends Controller
         $records = $all->filter(fn ($r) => $r->date->format('Y-m') === $month);
         $records = ($dir === 'asc' ? $records->sortBy($key) : $records->sortByDesc($key))->values();
 
-        return view('students.history', compact('student', 'records', 'months', 'month', 'sort', 'dir'));
+        return view('student.history', compact('student', 'records', 'months', 'month', 'sort', 'dir'));
     }
 
     /** The students profile of whoever is logged in (403 if somehow missing). */

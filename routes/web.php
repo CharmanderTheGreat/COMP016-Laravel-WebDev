@@ -18,10 +18,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [SessionsController::class, 'store']);
 });
 
-Route::post('/logout', [SessionsController::class, 'destroy'])->middleware('auth');
+Route::delete('/logout', [SessionsController::class, 'destroy'])->middleware('auth');
 
 // ---- Student side ----
-Route::middleware(['auth', 'role:students'])
+Route::middleware(['auth', 'role:student'])
     ->prefix('students')
     ->name('students.')
     ->group(function () {

@@ -29,18 +29,13 @@
         <div class="overflow-x-auto">
             <table class="table table-zebra">
                 <thead>
-                    <tr><th>Date</th><th>Subject</th><th>Status</th></tr>
+                    <tr><th>Date</th><th>Subject</th></tr>
                 </thead>
                 <tbody>
                     @foreach ($recent as $record)
                         <tr>
                             <td>{{ $record->date->format('M d, Y') }}</td>
                             <td>{{ $record->subject->code }}</td>
-                            <td>
-                                <span class="badge {{ $record->status->badgeClass() }}">
-                                    {{ $record->status->label() }}
-                                </span>
-                            </td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum Role: string
 {
-    case Student = "students";
+    case Student = "student";
     case Instructor = "instructor";
 
     /**

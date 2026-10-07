@@ -16,6 +16,7 @@
                 <span class="text-sm">{{ $student->full_name }}</span>
                 <form action="/logout" method="POST">
                     @csrf
+                    @method("DELETE")
                     <button class="btn btn-sm btn-ghost">Log out</button>
                 </form>
             </div>

@@ -35,7 +35,7 @@ class SessionsController extends Controller
         if (preg_match(Student::ID_REGEX, strtoupper($login))) {
             // Looks like a students ID -> find that students's account email
             $email = User::whereHas(
-                'students',
+                'student',
                 fn ($q) => $q->where('student_number', strtoupper($login))
             )->value('email') ?? '';
 
