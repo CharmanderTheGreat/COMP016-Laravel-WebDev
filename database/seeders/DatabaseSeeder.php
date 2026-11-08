@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SubjectSeeder::class,
             InstructorSeeder::class,
+            StudentSeeder::class
         ]);
     }
 }
