@@ -97,7 +97,10 @@ database/
     DatabaseSeeder.php
     DemoAttendanceSeeder.php
     InstructorSeeder.php
+<<<<<<< HEAD
     StudentSeeder.php
+=======
+>>>>>>> 25e9dd35b8635ed344c33bf4c8c6d3e68b52ee16
     SubjectSeeder.php
   .gitignore
 public/
@@ -164,7 +167,6 @@ tests/
     ExampleTest.php
   TestCase.php
 .editorconfig
-.env.example
 .gitattributes
 .gitignore
 artisan
@@ -179,6 +181,7 @@ vite.config.js
 <files>
 This section contains the contents of the repository's files.
 
+<<<<<<< HEAD
 <file path="database/seeders/StudentSeeder.php">
 <?php
 
@@ -207,6 +210,13 @@ class StudentSeeder extends Seeder
 
 namespace App\Enums;
 
+=======
+<file path="app/Enums/AttendanceStatus.php">
+<?php
+
+namespace App\Enums;
+
+>>>>>>> 25e9dd35b8635ed344c33bf4c8c6d3e68b52ee16
 /**
  * The four attendance statuses, plus how each one is displayed.
  * Class names are full strings so Tailwind/daisyUI can detect them.
@@ -2182,7 +2192,11 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         <div role="alert" class="alert alert-error mb-4"><span>{{ $message }}</span></div>
         @enderror
 
+<<<<<<< HEAD
         <form method="POST" action="/instructor/attendance/create">
+=======
+        <form method="POST" action="/instructor/attendance/store">
+>>>>>>> 25e9dd35b8635ed344c33bf4c8c6d3e68b52ee16
             @csrf
 
             <div class="card bg-base-100 shadow-sm">
@@ -3705,6 +3719,7 @@ class Student extends Model
 </x-student-layout>
 </file>
 
+<<<<<<< HEAD
 <file path=".env.example">
 APP_NAME=Laravel
 APP_ENV=local
@@ -3773,6 +3788,8 @@ AWS_USE_PATH_STYLE_ENDPOINT=false
 VITE_APP_NAME="${APP_NAME}"
 </file>
 
+=======
+>>>>>>> 25e9dd35b8635ed344c33bf4c8c6d3e68b52ee16
 <file path="README.md">
 # COMP016 Laravel Attendance System: Student Side Documentation
 
@@ -4436,7 +4453,11 @@ Route::middleware(['auth', 'role:instructor'])
         ->name('instructor.attendance.show');
 
         Route::get("/attendance/create", [Instructor\AttendanceController::class, 'create']);
+<<<<<<< HEAD
         Route::post("/attendance/create", [Instructor\AttendanceController::class, 'store']);
+=======
+        Route::post("/attendance/store", [Instructor\AttendanceController::class, 'store']);
+>>>>>>> 25e9dd35b8635ed344c33bf4c8c6d3e68b52ee16
     });
 </file>
 

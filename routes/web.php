@@ -42,6 +42,6 @@ Route::middleware(['auth', 'role:instructor'])
         ->name('instructor.attendance.show');
 
         Route::get("/attendance/create", [Instructor\AttendanceController::class, 'create']);
-        Route::post("/attendance/create", [Instructor\AttendanceController::class, 'store']);
+        Route::post("/attendance/store", [Instructor\AttendanceController::class, 'store']);
     });
 
