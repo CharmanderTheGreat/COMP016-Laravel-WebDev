@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use App\Enums\AttendanceStatus;;
+use App\Models\Subject;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -41,21 +43,31 @@ class AttendanceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $validated = $request->validate([
-            "ids" => ["required", "array", "min:1"],
-            "ids.*" => ["integer", "exists:students,id"],
+            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids.*' => ['integer', 'exists:students,id'],
         ]);
 
-        foreach ($validated["ids"] as $id) {
-            Attendance::firstOrCreate([
-                "student_id" => $id,
-                "date" => today()
-            ]);
-        }
+        $subject = Subject::firstOrFail();
 
-        return redirect("/instructor/attendance");
+        DB::transaction(function () use ($validated, $subject) {
+            foreach ($validated['student_ids'] as $studentId) {
+                Attendance::updateOrCreate(
+                    [
+                        'student_id' => $studentId,
+                        'subject_id' => $subject->id,
+                        'date' => today(),
+                    ],
+                    [
+                        'status' => AttendanceStatus::Present,
+                    ]
+                );
+            }
+        });
+
+        return redirect('/instructor/attendance')
+            ->with('success', 'Attendance saved successfully.');
     }
 
     /**

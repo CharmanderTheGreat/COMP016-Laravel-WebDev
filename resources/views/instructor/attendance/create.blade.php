@@ -9,7 +9,7 @@
         <div role="alert" class="alert alert-error mb-4"><span>{{ $message }}</span></div>
         @enderror
 
-        <form method="POST" action="/instructor/attendance/create">
+        <form method="POST" action="/instructor/attendance/store">
             @csrf
 
             <div class="card bg-base-100 shadow-sm">
