@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\User;
+use App\Support\ProfilePhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,14 +15,14 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-    /** Show the students sign up form. */
+    /** Show the student sign up form. */
     public function create()
     {
         return view('auth.register');
     }
 
     /**
-     * Handle students sign up.
+     * Handle student sign up.
      * Only students can register; the instructor is seeded (InstructorSeeder).
      */
     public function store(Request $request)
@@ -46,11 +47,8 @@ class UserController extends Controller
             'student_number.regex' => 'ID number must look like 2024-00482-SR-0.',
         ]);
 
-        // Save the picture to storage/app/public/profile-photos
-        $photoPath = $request->file('profile_photo')->store('profile-photos', 'public');
-
-        // Create the user + students profile together (all or nothing)
-        $user = DB::transaction(function () use ($data, $photoPath) {
+        // Create the user + student profile + picture together (all or nothing)
+        $user = DB::transaction(function () use ($data, $request) {
             $user = User::create([
                 'name'     => $data['first_name'] . ' ' . $data['last_name'],
                 'email'    => $data['email'],
@@ -58,15 +56,17 @@ class UserController extends Controller
                 'role'     => Role::Student,     // hardcoded: nobody can self-register as instructor
             ]);
 
-            $user->student()->create([
+            $student = $user->student()->create([
                 'first_name'     => $data['first_name'],
                 'last_name'      => $data['last_name'],
                 'student_number' => $data['student_number'],
                 'course'         => $data['course'],
                 'year_level'     => $data['year_level'],
                 'section'        => $data['section'],
-                'profile_photo'  => $photoPath,
             ]);
+
+            // Picture goes into the database (Railway has no persistent disk)
+            ProfilePhoto::store($student, $request->file('profile_photo'));
 
             return $user;
         });

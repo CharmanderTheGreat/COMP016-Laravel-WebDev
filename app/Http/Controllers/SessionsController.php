@@ -20,7 +20,7 @@ class SessionsController extends Controller
      * One "login" field for everyone:
      *  - Students log in with their ID number only (their email is just shown on the profile).
      *  - The instructor has no ID, so they log in with their email.
-     * After login, the user's role decides which dashboard they land on.
+     * After login, the user's role decides which page they land on.
      */
     public function store(Request $request)
     {
@@ -33,7 +33,7 @@ class SessionsController extends Controller
         $password = $request->input('password');
 
         if (preg_match(Student::ID_REGEX, strtoupper($login))) {
-            // Looks like a students ID -> find that students's account email
+            // Looks like a student ID -> find that student's account email
             $email = User::whereHas(
                 'student',
                 fn ($q) => $q->where('student_number', strtoupper($login))
@@ -42,7 +42,7 @@ class SessionsController extends Controller
             $credentials = ['email' => $email, 'password' => $password];
         } else {
             // Anything else is treated as an email, and ONLY instructors may use it.
-            // The extra 'role' condition makes a students's email fail here.
+            // The extra 'role' condition makes a student's email fail here.
             $credentials = [
                 'email'    => $login,
                 'password' => $password,
@@ -53,7 +53,6 @@ class SessionsController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate(); // prevents session fixation
 
-            // Student -> /students/dashboard, instructor -> /instructor/dashboard
             return redirect()->intended(Auth::user()->role->homePath());
         }
 
@@ -63,7 +62,7 @@ class SessionsController extends Controller
             ->onlyInput('login');
     }
 
-    /** Log out (POST /logout). */
+    /** Log out (DELETE /logout). */
     public function destroy(Request $request)
     {
         Auth::logout();

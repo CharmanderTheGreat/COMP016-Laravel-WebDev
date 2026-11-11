@@ -13,13 +13,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Short alias so routes can say 'role:students'
+        // Railway terminates HTTPS at its proxy. Trusting the forwarded headers makes
+        // Laravel see the request as https, so redirects and generated URLs stay https.
+        $middleware->trustProxies(at: '*');
+
+        // Short alias so routes can say 'role:student' or 'role:instructor'
         $middleware->alias(['role' => EnsureUserHasRole::class]);
 
         // Not logged in -> go to the login page
         $middleware->redirectGuestsTo('/login');
 
-        // Already logged in but opened /login or /register -> go to own dashboard
+        // Already logged in but opened /login or /register -> go to own home page
         $middleware->redirectUsersTo(
             fn (Request $request) => $request->user()->role->homePath()
         );

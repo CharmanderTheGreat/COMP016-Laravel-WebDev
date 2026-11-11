@@ -4,12 +4,11 @@ namespace App\Enums;
 
 enum Role: string
 {
-    case Student = "student";
-    case Instructor = "instructor";
+    case Student = 'student';
+    case Instructor = 'instructor';
 
     /**
-     * Where this role lands after login/register.
-     * This is the "auto-detect role" part: login just redirects here.
+     * Where this role lands after login/register (the "auto-detect role" part).
      */
     public function homePath(): string
     {

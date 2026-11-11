@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Student extends Model
 {
@@ -14,6 +15,13 @@ class Student extends Model
 
     /** Courses shown in the sign up dropdown. Edit this list as needed. */
     public const COURSES = ['BSIT', 'BSCS', 'BSIS'];
+
+    /**
+     * Value of `profile_photo` meaning "the picture lives in the student_photos table".
+     * Older rows hold a file path from the pre-Railway days; those files no longer exist,
+     * so they are treated as "no photo" and show initials instead.
+     */
+    public const PHOTO_IN_DB = 'db';
 
     protected $fillable = [
         'user_id',
@@ -36,13 +44,18 @@ class Student extends Model
         return $this->hasMany(Attendance::class);
     }
 
-    /** $students->full_name => "Juan Dela Cruz" */
+    public function photo(): HasOne
+    {
+        return $this->hasOne(StudentPhoto::class);
+    }
+
+    /** $student->full_name => "Juan Dela Cruz" */
     protected function fullName(): Attribute
     {
         return Attribute::get(fn () => "{$this->first_name} {$this->last_name}");
     }
 
-    /** $students->class_label => "BSIT 3-2" */
+    /** $student->class_label => "BSIT 3-2" */
     protected function classLabel(): Attribute
     {
         return Attribute::get(
@@ -51,13 +64,15 @@ class Student extends Model
     }
 
     /**
-     * $students->photo_url => public URL of the profile picture, or null.
-     * Uses asset() so it follows the current host (needs `php artisan storage:link`).
+     * $student->photo_url => relative URL of the picture route, or null when there is none.
+     * Relative on purpose: it can never turn into a mixed-content http:// link behind Railway's proxy.
      */
     protected function photoUrl(): Attribute
     {
         return Attribute::get(
-            fn () => $this->profile_photo ? asset('storage/' . $this->profile_photo) : null
+            fn () => $this->profile_photo === self::PHOTO_IN_DB
+                ? route('photos.show', $this, false)
+                : null
         );
     }
 }

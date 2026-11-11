@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Enums\AttendanceStatus;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Support\AttendanceExport;
+use App\Support\ProfilePhoto;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 /**
- * Student side: dashboard, profile (read-only), attendance history.
- * Every method only ever reads the LOGGED-IN students's own data.
+ * Student side: dashboard, profile, attendance history.
+ * Every method only ever reads the LOGGED-IN student's own data.
  */
 class StudentController extends Controller
 {
@@ -29,6 +31,12 @@ class StudentController extends Controller
         $counts = collect(AttendanceStatus::cases())
             ->mapWithKeys(fn ($s) => [$s->value => (int) ($totals[$s->value] ?? 0)]);
 
+        // Attendance rate = (present + late) out of everything recorded
+        $total = $counts->sum();
+        $rate = $total > 0
+            ? (int) round((($counts['present'] + $counts['late']) / $total) * 100)
+            : null;
+
         $recent = $student->attendances()
             ->with('subject')
             ->orderByDesc('date')
@@ -37,15 +45,29 @@ class StudentController extends Controller
 
         $subject = Subject::first();
 
-        return view('student.dashboard', compact('student', 'counts', 'recent', 'subject'));
+        return view('student.dashboard', compact('student', 'counts', 'total', 'rate', 'recent', 'subject'));
     }
 
-    /** Profile tab (view only for now). */
+    /** Profile tab. */
     public function profile(Request $request)
     {
         $student = $this->currentStudent($request);
 
         return view('student.profile', compact('student'));
+    }
+
+    /** Replace the profile picture (also fixes accounts whose old picture was lost). */
+    public function updatePhoto(Request $request)
+    {
+        $student = $this->currentStudent($request);
+
+        $request->validate([
+            'profile_photo' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // 2MB
+        ]);
+
+        ProfilePhoto::store($student, $request->file('profile_photo'));
+
+        return redirect()->route('students.profile')->with('success', 'Profile picture updated.');
     }
 
     /**
@@ -85,12 +107,40 @@ class StudentController extends Controller
         $records = $all->filter(fn ($r) => $r->date->format('Y-m') === $month);
         $records = ($dir === 'asc' ? $records->sortBy($key) : $records->sortByDesc($key))->values();
 
-        return view('student.history', compact('student', 'records', 'months', 'month', 'sort', 'dir'));
+        // Counts for the selected month (the little summary above the table)
+        $monthCounts = collect(AttendanceStatus::cases())
+            ->mapWithKeys(fn ($s) => [$s->value => $records->where('status', $s)->count()]);
+
+        return view('student.history', compact('student', 'records', 'months', 'month', 'sort', 'dir', 'monthCounts'));
     }
 
-    /** The students profile of whoever is logged in (403 if somehow missing). */
+    /** Download my attendance as an Excel file (a Summary sheet + one sheet per month). */
+    public function export(Request $request)
+    {
+        $student = $this->currentStudent($request);
+        $subject = Subject::first();
+
+        $records = $student->attendances()->with('subject')->get()
+            ->map(fn ($r) => [
+                'date'    => $r->date->toDateString(),
+                'subject' => $r->subject->code,
+                'status'  => $r->status->value,
+            ])
+            ->all();
+
+        $xlsx = AttendanceExport::forStudent([
+            'name'    => $student->full_name,
+            'number'  => $student->student_number,
+            'class'   => $student->class_label,
+            'subject' => $subject ? "{$subject->code} – {$subject->name}" : '',
+        ], $records);
+
+        return $this->xlsxResponse($xlsx, 'attendance-' . $student->student_number . '.xlsx');
+    }
+
+    /** The student profile of whoever is logged in (403 if somehow missing). */
     private function currentStudent(Request $request): Student
     {
-        return $request->user()->student ?? abort(403, 'No students profile found.');
+        return $request->user()->student ?? abort(403, 'No student profile found.');
     }
 }

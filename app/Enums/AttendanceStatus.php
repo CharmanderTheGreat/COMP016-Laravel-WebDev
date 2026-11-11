@@ -4,7 +4,7 @@ namespace App\Enums;
 
 /**
  * The four attendance statuses, plus how each one is displayed.
- * Class names are full strings so Tailwind/daisyUI can detect them.
+ * Class names are written out in full so Tailwind/daisyUI can detect them.
  */
 enum AttendanceStatus: string
 {
@@ -35,14 +35,14 @@ enum AttendanceStatus: string
         };
     }
 
-    /** Text colour (used in the hero counters). */
-    public function textClass(): string
+    /** Solid colour used for dots, numbers and the stacked bar. */
+    public function hex(): string
     {
         return match ($this) {
-            self::Present => 'text-success',
-            self::Late => 'text-warning',
-            self::Absent => 'text-error',
-            self::Excused => 'text-info',
+            self::Present => '#2f7d4f',
+            self::Late => '#d99f00',
+            self::Absent => '#d92d20',
+            self::Excused => '#2563a8',
         };
     }
 }
