@@ -14,7 +14,9 @@ class StudentSeeder extends Seeder
     /**
      * Demo students: BSIT 3-2, password "Student@123" for all of them.
      * Log in with the ID number. To add more, just add a line to the list below.
-     * Safe to run again: existing students are updated, not duplicated.
+     * Safe to run again, and Railway runs it on every deploy: it only CREATES students that
+     * are missing. A student that already exists (same ID number or same email) is skipped,
+     * so a changed password or a real student's details are never overwritten.
      */
     public function run(): void
     {
@@ -57,26 +59,28 @@ class StudentSeeder extends Seeder
                     default => Str::lower($first . '.' . str_replace(' ', '', $last)) . '@example.com',
                 };
 
-                $user = User::updateOrCreate(
-                    ['email' => $email],
-                    [
-                        'name'     => "{$first} {$last}",
-                        'password' => 'Student@123', // hashed automatically by the User cast
-                        'role'     => Role::Student,
-                    ]
-                );
+                // Already there (same ID number or same email)? Leave it exactly as it is.
+                if (Student::where('student_number', $number)->exists()
+                    || User::where('email', $email)->exists()) {
+                    continue;
+                }
 
-                Student::updateOrCreate(
-                    ['student_number' => $number],
-                    [
-                        'user_id'    => $user->id,
-                        'first_name' => $first,
-                        'last_name'  => $last,
-                        'course'     => 'BSIT',
-                        'year_level' => 3,
-                        'section'    => 2,
-                    ]
-                );
+                $user = User::create([
+                    'name'     => "{$first} {$last}",
+                    'email'    => $email,
+                    'password' => 'Student@123', // hashed automatically by the User cast
+                    'role'     => Role::Student,
+                ]);
+
+                Student::create([
+                    'user_id'        => $user->id,
+                    'first_name'     => $first,
+                    'last_name'      => $last,
+                    'student_number' => $number,
+                    'course'         => 'BSIT',
+                    'year_level'     => 3,
+                    'section'        => 2,
+                ]);
             }
         });
     }
