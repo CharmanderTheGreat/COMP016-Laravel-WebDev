@@ -296,6 +296,19 @@ class AttendanceSystemTest extends TestCase
         $this->seed(DemoAttendanceSeeder::class);
         $this->assertSame($first, Attendance::count());
         $this->assertSame(24, Student::count());
+
+        // Railway runs db:seed on every deploy: it must not undo changes made in the app
+        $instructor = User::where('role', Role::Instructor->value)->firstOrFail();
+        $instructor->update(['name' => 'Prof Changed', 'password' => 'Changed@123']);
+        $student = Student::where('student_number', '2024-00003-SR-0')->firstOrFail();
+        $student->user->update(['password' => 'Temp@12345']);
+
+        $this->seed(DatabaseSeeder::class);
+
+        $this->assertSame('Prof Changed', $instructor->fresh()->name);
+        $this->assertTrue(Hash::check('Changed@123', $instructor->fresh()->password));
+        $this->assertTrue(Hash::check('Temp@12345', $student->user->fresh()->password));
+        $this->assertSame(1, User::where('role', Role::Instructor->value)->count());
     }
 
     // ---------------------------------------------------------------- every page renders

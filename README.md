@@ -44,7 +44,7 @@ Every account is one row in `users` (name, email, hashed password, `role`). A st
 |---|---|
 | `instructor@example.com` | `Instructor@123` |
 
-To use real details, edit the name / email / password inside that file and run `php artisan db:seed --class=InstructorSeeder`. It uses `updateOrCreate` on the email, so running it again never creates a duplicate.
+To use real details, edit the name / email / password inside that file and run `php artisan db:seed --class=InstructorSeeder`. It only creates the default instructor when **no instructor exists yet**, so it never overwrites a name or password you changed on the Profile page (this matters because Railway runs the seeders on every deploy, see section 3).
 
 **Option 2: the command (recommended for a real instructor)**
 
@@ -92,7 +92,7 @@ Common errors: *"ID number must look like 2024-00482-SR-0"* (wrong format), *"Th
 - password for all of them: `Student@123`
 - emails like `ana.reyes@example.com` (`juan@example.com` and `maria@example.com` for the first two). Students log in with the **ID number**, not the email.
 
-Run it with `php artisan db:seed --class=StudentSeeder`, or `php artisan db:seed` for subject + instructor + students together. It is safe to run again (nothing is duplicated).
+Run it with `php artisan db:seed --class=StudentSeeder`, or `php artisan db:seed` for subject + instructor + students together. It only creates students that are **missing**: a student whose ID number or email already exists is skipped, so passwords reset by the instructor and real students' details are never overwritten. On Railway this happens automatically on every deploy (section 3), so you normally do not need to run it by hand.
 
 To add more demo students, add `['First', 'Last'],` lines at the **end** of the `$names` list in that file (the ID number is made from the position in the list, so adding at the end keeps the existing IDs the same) and run the seeder again.
 
@@ -122,6 +122,7 @@ There is no email sending. The instructor opens **Students**, presses **Reset** 
 
 ## 3. Deploying on Railway (what to know)
 
+- **The start command does the database work.** The Railway variable `NIXPACKS_START_CMD` is `php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=$PORT`. So every deploy runs the migrations and `DatabaseSeeder` (subject, default instructor, 24 demo students; each only creates what is missing). `DemoAttendanceSeeder` is **not** part of it on purpose: it fills fake attendance for every weekday up to today, which would collide with the days the instructor really records. To load the demo attendance once, add `&& php artisan db:seed --class=DemoAttendanceSeeder --force` before `php artisan serve` in `NIXPACKS_START_CMD`, deploy once, then remove it again.
 - The deploy must run `php artisan migrate --force`. Round 2 added one migration (`2026_11_10_100000_...`); it only adds a table and fixes a column default, so it is safe on the live database. Round 3 added **no** migration.
 - Railway's disk is wiped on every deploy and there is no Volume, so nothing may be saved as a file. That is why profile pictures live in the database. (The PUP logo is different: it is part of the code, in `public/images/`, so it is redeployed every time.)
 - Students who signed up **before** Round 2 lost their picture. They show initials until they upload a new one from **Profile**.
@@ -291,6 +292,7 @@ tests/Feature/AttendanceSystemTest.php
 - `php artisan instructor:create` command.
 - 24 demo students (was 2); `DemoAttendanceSeeder` now gives each student a different habit, covers 60 days, and never overwrites existing records.
 - Detailed account documentation (section 1).
+- Seeders no longer overwrite existing accounts (Railway runs `db:seed` on every deploy, which used to reset the instructor password and the demo students).
 
 ### Round 2 (Nov 10, 2026): polishing
 - Navbar brand "Idea" removed; the brand links to the user's real home page.
