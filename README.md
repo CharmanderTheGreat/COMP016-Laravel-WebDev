@@ -122,8 +122,9 @@ There is no email sending. The instructor opens **Students**, presses **Reset** 
 
 ## 3. Deploying on Railway (what to know)
 
-- **The start command does the database work.** The Railway variable `NIXPACKS_START_CMD` is `php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=$PORT`. So every deploy runs the migrations and `DatabaseSeeder` (subject, default instructor, 24 demo students; each only creates what is missing). `DemoAttendanceSeeder` is **not** part of it on purpose: it fills fake attendance for every weekday up to today, which would collide with the days the instructor really records. To load the demo attendance once, add `&& php artisan db:seed --class=DemoAttendanceSeeder --force` before `php artisan serve` in `NIXPACKS_START_CMD`, deploy once, then remove it again.
-- The deploy must run `php artisan migrate --force`. Round 2 added one migration (`2026_11_10_100000_...`); it only adds a table and fixes a column default, so it is safe on the live database. Round 3 added **no** migration.
+- **Migrations and seeding on Railway.** The current Railway builder (FrankenPHP) uses its own start script and **ignores `NIXPACKS_START_CMD`** (the deploy logs show no `migrate` or `db:seed` lines). So set this in the service: **Settings, Deploy, Pre-deploy Command**: `php artisan migrate --force && php artisan db:seed --force`. It runs before every start, with access to the database. The seeders only create what is missing (subject, default instructor, 24 demo students), so running them on every deploy is safe. If you cannot use a pre-deploy command, run the same two commands once from your computer (see section 1).
+- `DemoAttendanceSeeder` is **not** part of `DatabaseSeeder` on purpose: it fills fake attendance for every weekday up to today, which would collide with the days the instructor really records. Run it by hand once: `php artisan db:seed --class=DemoAttendanceSeeder --env=production --force` (see section 1).
+- Migrations must run on every deploy (see above). Round 2 added one migration (`2026_11_10_100000_...`); it only adds a table and fixes a column default, so it is safe on the live database. Round 3 added **no** migration.
 - Railway's disk is wiped on every deploy and there is no Volume, so nothing may be saved as a file. That is why profile pictures live in the database. (The PUP logo is different: it is part of the code, in `public/images/`, so it is redeployed every time.)
 - Students who signed up **before** Round 2 lost their picture. They show initials until they upload a new one from **Profile**.
 - The CDN versions of Tailwind and daisyUI are pinned in `resources/views/components/layout.blade.php`, and there is no Vite build step, so the deploy does not depend on npm.
@@ -292,7 +293,7 @@ tests/Feature/AttendanceSystemTest.php
 - `php artisan instructor:create` command.
 - 24 demo students (was 2); `DemoAttendanceSeeder` now gives each student a different habit, covers 60 days, and never overwrites existing records.
 - Detailed account documentation (section 1).
-- Seeders no longer overwrite existing accounts (Railway runs `db:seed` on every deploy, which used to reset the instructor password and the demo students).
+- Seeders no longer overwrite existing accounts (if `db:seed` runs on every deploy, the old seeders would have reset the instructor password and the demo students).
 
 ### Round 2 (Nov 10, 2026): polishing
 - Navbar brand "Idea" removed; the brand links to the user's real home page.
